@@ -1,0 +1,124 @@
+<!DOCTYPE html>  
+<html lang="en">  
+  
+<head>  
+    <meta charset="UTF-8">  
+    <title>Snake</title>  
+</head>  
+<style>
+    #canvas {
+        border: 1px solid #000;
+    }
+</style>  
+  
+<body>  
+    <canvas id="canvas" width="400" height="400"></canvas>
+    <button onclick="play()">play</button>
+</body>  
+
+<script type="text/javascript">
+    var speed = 100;
+    var snakeNode = 5;
+    var snakeLength = 20;
+    var ctx = document.getElementById("canvas").getContext("2d"); 
+    var direction = "up";
+    var snakeArray = [];
+    var food;
+    var foodNum = 0;
+    var x,y;
+    var interval;
+    function play() {
+        ctx.clearRect(0,0,400,400);
+        dropFood();
+        x = Math.floor(Math.random()*80)*5;
+        y = Math.floor(Math.random()*80)*5;
+        interval = setInterval(move,speed);
+    }
+
+    function move() {
+        switch(direction) {
+            case "up": 
+                y = y - snakeNode;
+                break;
+            case "down":
+                y = y + snakeNode;
+                break;
+            case "left":
+                x = x - snakeNode;
+                break;
+            case "right":
+                x = x + snakeNode;
+                break;
+        }
+
+        if (x > 400 || x < 0 || y > 400 || y < 0) {
+            alert("stupid");
+            clearInterval(interval);
+        }
+
+        for (var i = 0; i < snakeArray.length; i++) {
+            if (x == snakeArray[i]["x"] && y == snakeArray[i]["y"]) {
+                alert("stupid");
+                clearInterval(interval);
+            }
+        }
+
+        snakeArray.push({"x": x,"y": y});
+
+        if (x == food["x"] && y == food["y"]) {
+            snakeLength++;
+            foodNum++;
+            if (foodNum%5 == 0) {
+                speed = speed - 10;
+                clearInterval(interval);
+                interval = setInterval(move,speed);
+            }
+            ctx.fillRect(food["x"],food["y"],snakeNode,snakeNode);
+            dropFood();
+        }
+
+        if (snakeArray.length > snakeLength) {
+            var clearNode = snakeArray.shift();
+            ctx.clearRect(clearNode["x"],clearNode["y"],snakeNode,snakeNode);
+        }
+        ctx.fillStyle = "black";
+        ctx.fillRect(x,y,snakeNode,snakeNode);
+    }
+
+    function dropFood() {
+        food = {
+            "x": (Math.floor(Math.random()*80))*5,
+            "y": (Math.floor(Math.random()*80))*5
+        }
+        ctx.fillStyle = "red";
+        ctx.fillRect(food["x"],food["y"],snakeNode,snakeNode);
+    }
+
+    document.onkeydown = function(e) {
+        var code = e.keyCode - 37;
+        switch(code) {
+            case 1: 
+                if (direction != "down") {
+                    direction = "up";
+                }
+                break;
+            case 2:
+                if (direction != "left") {
+                    direction = "right";
+                }
+                break;
+            case 3:
+                if (direction != "up") {
+                    direction = "down";
+                }
+                break;
+            case 0:
+                if (direction != "right") {
+                    direction = "left";
+                }
+                break;
+        }
+    }
+</script>
+  
+</html>
