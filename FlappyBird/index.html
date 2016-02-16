@@ -1,0 +1,103 @@
+<!DOCTYPE html>  
+<html lang="en">  
+  
+<head>  
+    <meta charset="UTF-8">  
+    <title>FlappyBird</title>  
+
+    <script src="jquery-2.2.0.min.js"></script>
+</head>  
+<style>
+    body {
+        text-align: center;
+    }
+    #canvas {
+        border: 1px solid #000;
+    }
+</style>  
+  
+<body>  
+    <canvas id="canvas" width="400" height="400"></canvas>
+    <button onclick="play()">play</button>
+</body>  
+
+<script type="text/javascript">
+
+    var ctx = document.getElementById("canvas").getContext("2d"); 
+    var birdSize = 10;
+    var birdX = 20;
+    var birdY = 100;
+    var interval;
+    var pillarInterval;
+    var pillarMoveInterval;
+    var pillarArray = [];
+    var pillarSize = 20;
+    var canvasHeight = 400;
+
+    function move() {
+        interval = setInterval(function() {
+            ctx.clearRect(birdX,birdY,birdSize,birdSize);
+            birdY = birdY + 2;
+            ctx.fillRect(birdX,birdY,birdSize,birdSize);
+        },50);
+    }
+   
+
+    function play() {
+        move();
+
+        setPillar();
+    }
+
+    function Pillar() {
+        this.x = 0;
+    }
+
+    function setPillar() {
+        pillarInterval = setInterval(function() {
+            var pathY = (Math.ceil(Math.random()*30))*10;
+            var height = (Math.ceil(Math.random()*2))*40;
+            pillarArray.push({"x": 380,"y": pathY,"height": height});
+            ctx.fillRect(380,0,pillarSize,pathY);
+            ctx.fillRect(380,pathY + height,pillarSize,400 - pathY);
+            pillarMove();
+        },4000)
+    }
+
+    function pillarMove() {
+        if (pillarArray.length != 0) {
+            clearInterval(pillarMoveInterval);
+            
+            pillarMoveInterval = setInterval(function() {
+                if (pillarArray[0]["x"] == -20) {
+                    pillarArray.shift();
+                }
+                $.each(pillarArray, function(index,el) {
+                    if (birdX >= (el["x"] - birdSize) && birdX <= (el["x"] + 30) && birdY <= el["y"] || birdX >= (el["x"] - birdSize) && birdX <= el["x"] + 30 && birdY >= el["y"] + el["height"] - birdSize) {
+                        alert("game over");
+                        clearInterval(pillarInterval);
+                        clearInterval(interval);
+                        clearInterval(pillarMoveInterval);
+                        // break;
+                    }
+                    ctx.clearRect(el["x"],0,pillarSize,canvasHeight);
+                    el["x"] = el["x"] - 1;
+                    ctx.fillRect(el["x"],0,pillarSize,el["y"]);
+                    ctx.fillRect(el["x"],el["y"] + el["height"],pillarSize,400 - el["y"]);
+                });
+            },50)
+        }
+       
+    }
+
+
+    document.onclick = function() {
+        clearInterval(interval);
+        ctx.clearRect(birdX,birdY,birdSize,birdSize);
+        birdY = birdY - 40;
+        ctx.fillRect(birdX,birdY,birdSize,birdSize);
+        move();
+    }
+</script>
+  
+</html>
